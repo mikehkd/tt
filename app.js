@@ -191,7 +191,7 @@ function addChatItem(color, data, text, summarize) {
 	container.append(`
     <div class=${summarize ? "temporary" : "static"}>
         <span>
-            <b>${LocalTime} </b>
+            <b>[${LocalTime}]</b>
             <img class="miniprofilepicture" src="${data.profilePictureUrl}">
             ${generateUsernameLink(data)}:
             <span style="color:${color}">${sanitize(text)}</span>
@@ -216,8 +216,8 @@ function addGiftItem(data) {
 		? $(".eventcontainer")
 		: $(".giftcontainer");
 	/*if (container.find('div').length > 2000) {
-					container.find('div').slice(0, 100).remove();
-				}*/
+						  container.find('div').slice(0, 100).remove();
+					  }*/
 	let streakId = data.userId.toString() + "_" + data.giftId;
 	let targetGift = gifts.gifts.find((gift) => gift.id === Number(data.giftId));
 	let Giftname;
@@ -231,23 +231,15 @@ function addGiftItem(data) {
         <div data-streakid=${isPendingStreak(data) ? streakId : ""}>
             <img class="miniprofilepicture" src="${data.profilePictureUrl}">
             <span>
-                <b>${formatTime(
-		"HH:MM:SS",
-		data.createTime
-	)} ${generateUsernameLink(data)}</b><span></span>送出了<br>
+                <b>${formatTime("HH:MM:SS", data.createTime)} ${generateUsernameLink(data)}</b><span></span>送出了<br>
                 <div>
                     <table>
                         <tr>
-                            <td><img class="gifticon" src="${data.giftPictureUrl
-		}"></td>
+                            <td><img class="gifticon" src="${data.giftPictureUrl}"></td>
                             <td>
-                                <span>礼物: <b><span style="color: red">${Giftname}</span></b><span style="color: white"> (礼物ID:${data.giftId
-		})</span><span><br>
-                                <span>数量: <b style="${isPendingStreak(data) ? "color:red" : ""
-		}">x${data.repeatCount.toLocaleString()}</b><span><br>
-                                <span>价值: <b>${(
-			data.diamondCount * data.repeatCount
-		).toLocaleString()} 钻石</b><span>
+                                <span>礼物: <b><span style="color: red">${Giftname}</span></b><span style="color: white"> (礼物ID:${data.giftId})</span><span><br>
+                                <span>数量: <b style="${isPendingStreak(data) ? "color:red" : ""}">x${data.repeatCount.toLocaleString()}</b><span><br>
+                                <span>价值: <b>${(data.diamondCount * data.repeatCount).toLocaleString()} 钻石</b><span>
                             </td>
                         </tr>
                     </table>
@@ -299,7 +291,8 @@ function addGiftItem(data) {
 		}
 		直播统计[主播ID]["钻石贡献"][data.uniqueId][0].数量 +=
 			data.diamondCount * (data.repeatCount || 1);
-		直播统计[主播ID]["共获得钻石"] += data.diamondCount * (data.repeatCount || 1);
+		直播统计[主播ID]["共获得钻石"] +=
+			data.diamondCount * (data.repeatCount || 1);
 	} else if (data.giftType !== 1) {
 		if (!直播统计[主播ID][Giftname][data.uniqueId]) {
 			直播统计[主播ID][Giftname][data.uniqueId] = [
