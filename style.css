@@ -40,7 +40,22 @@ a {
 #roomStats b {
     margin-right: 20px;
 }
+.inputFields {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
 
+    .inputFields > p {
+        margin-right: 10px;
+        text-align: left;
+    }
+
+    #LeaderboardText {
+        text-align: center;
+        margin: 0 auto;
+    }
 .splitchattable, .splitstatetable {
     width: 100%;
 }
@@ -55,7 +70,7 @@ a {
 
 .chatcontainer, .giftcontainer, .eventcontainer {
     overflow-y: scroll;
-    height: calc(100vh - 240px);
+    height: calc(100vh - 220px);
     word-wrap: break-word;
 }
 

@@ -25,6 +25,8 @@ const formatTime = (format = "", num = new Date().getTime()) => {
 	}
 	return format;
 };
+let leaderboardText;
+let contributions;
 let 主播ID;
 let nowTime = Date.now();
 let Daynow = formatTime("mm月dd日", nowTime);
@@ -74,7 +76,30 @@ const setDraggingAndScrolling = (
 			}
 		});
 };
+
+// 定义函数来获取最新的贡献者名字和数量的内容
+function getTopThreeContributors() {
+  const topThreeContributors = Object.entries(contributions).slice(0, 3).map(([key, value], index) => {
+    const name = value[0].名字;
+    const quantity = value[0].数量;
+    const color = getColor(index);
+    const fontSize = getFontSize(index);
+    return `<span style="color: ${color}; font-size: ${fontSize}">${name}(${quantity}💎)</span>`;
+  });
+  return topThreeContributors;
+}
+// 辅助函数来生成不同的颜色和字体大小
+function getColor(index) {
+  const colors = ["red", "blue", "green"]; // 替换为你想要的颜色
+  return colors[index] || "black";
+}
+
+function getFontSize(index) {
+  const fontSizes = ["24px", "20px", "16px"]; // 替换为你想要的字体大小
+  return fontSizes[index] || "16px";
+}
 $(document).ready(() => {
+	leaderboardText = document.getElementById("LeaderboardText");
 	$("#connectButton").click(connect);
 	$("#uniqueIdInput").on("keyup", function (e) {
 		if (e.key === "Enter") {
@@ -322,6 +347,8 @@ function addGiftItem(data) {
 	直播统计[主播ID]["钻石贡献"] = sortByQuantity(直播统计[主播ID]["钻石贡献"]);
 	直播统计[主播ID][Giftname] = sortByQuantity(直播统计[主播ID][Giftname]);
 	localStorage.setItem(GiftDay, JSON.stringify(直播统计));
+	contributions = 直播统计[主播ID]["钻石贡献"];
+	leaderboardText.innerHTML = getTopThreeContributors().join("		");
 }
 // liveIntro
 connection.on("liveIntro", (msg) => {
