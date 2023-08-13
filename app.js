@@ -31,11 +31,13 @@ let 主播ID;
 let nowTime = Date.now();
 let Daynow = formatTime("mm月dd日", nowTime);
 let GiftDay = Daynow + "直播统计";
-// Counter
-let NewfollowerCount = 0;
 let 直播统计;
+let Giftname;
+// Counter
 let viewerCount = 0;
+let mostviewerCount = 0;
 let likeCount = 0;
+let newfansCount = 0;
 let diamondsCount = 0;
 let isDragging = false;
 let isScrolling = false;
@@ -55,20 +57,20 @@ const setDraggingAndScrolling = (
 	timeout
 ) => {
 	container
-		.on("mousedown", function () {
+		.on("mousedown", function() {
 			isDragging = true;
 		})
-		.on("mouseup", function () {
+		.on("mouseup", function() {
 			isDragging = false;
-			setTimeout(function () {
+			setTimeout(function() {
 				isScrolling = false;
 			}, timeout);
 		})
-		.on("scroll", function () {
+		.on("scroll", function() {
 			if (isDragging) {
 				isScrolling = true;
 				console.log("scroll");
-				setTimeout(function () {
+				setTimeout(function() {
 					if (!isDragging) {
 						isScrolling = false;
 					}
@@ -76,50 +78,52 @@ const setDraggingAndScrolling = (
 			}
 		});
 };
-
 // 定义函数来获取最新的贡献者名字和数量的内容
 function getTopThreeContributors() {
-  const topThreeContributors = Object.entries(contributions).slice(0, 3).map(([key, value], index) => {
-    const name = value[0].名字;
-    const quantity = value[0].数量;
-    const color = getColor(index);
-    const fontSize = getFontSize(index);
-    return `<span style="color: ${color}; font-size: ${fontSize}">${name}(${quantity}💎)</span>`;
-  });
-  return topThreeContributors;
-}
-// 辅助函数来生成不同的颜色和字体大小
+		const topThreeContributors = Object.entries(contributions).slice(0, 3).map(([key, value], index) => {
+			const name = value[0].名字;
+			const quantity = value[0].数量;
+			const color = getColor(index);
+			const fontSize = getFontSize(index);
+			return `<span style="color: ${color}; font-size: ${fontSize}">${name}(${quantity}💎)</span>`;
+		});
+		return topThreeContributors;
+	}
+	// 辅助函数来生成不同的颜色和字体大小
+
 function getColor(index) {
-  const colors = ["red", "blue", "green"]; // 替换为你想要的颜色
-  return colors[index] || "black";
+	const colors = ["red", "blue", "green"]; // 替换为你想要的颜色
+	return colors[index] || "black";
 }
 
 function getFontSize(index) {
-  const fontSizes = ["24px", "20px", "16px"]; // 替换为你想要的字体大小
-  return fontSizes[index] || "16px";
+	const fontSizes = ["24px", "20px", "16px"]; // 替换为你想要的字体大小
+	return fontSizes[index] || "16px";
 }
+
+
 $(document).ready(() => {
 	leaderboardText = document.getElementById("LeaderboardText");
 	$("#connectButton").click(connect);
-	$("#uniqueIdInput").on("keyup", function (e) {
+	$("#uniqueIdInput").on("keyup", function(e) {
 		if (e.key === "Enter") {
 			connect();
 		}
 	});
 	$(".chatcontainer, .giftcontainer, .eventcontainer")
-		.mousedown(function () {
+		.mousedown(function() {
 			isDragging = true;
 		})
-		.mouseup(function () {
+		.mouseup(function() {
 			isDragging = false;
-			setTimeout(function () {
+			setTimeout(function() {
 				isScrolling = false;
 			}, 500);
 		})
-		.scroll(function () {
+		.scroll(function() {
 			if (isDragging) {
 				isScrolling = true;
-				setTimeout(function () {
+				setTimeout(function() {
 					if (!isDragging) {
 						isScrolling = false;
 					}
@@ -128,92 +132,88 @@ $(document).ready(() => {
 		});
 	if (window.settings.username) connect();
 });
+
 function connect() {
-	let uniqueId = window.settings.username || $("#uniqueIdInput").val();
-	if (uniqueId !== "") {
-		$("#stateText").text("连接中...");
-		connection
-			.connect(uniqueId, {
-				enableExtendedGiftInfo: false,
-				clientParams: {
-					app_language: "zh-CN",
-				},
-			})
-			.then((state) => {
-				$("#stateText").text(`已连接到房间ID ${state.roomId}`);
-				主播ID = uniqueId;
-				// reset stats
-				直播统计 = JSON.parse(localStorage.getItem(GiftDay)) || {};
-				if (!直播统计.hasOwnProperty([主播ID])) {
-					直播统计[主播ID] = {
-						共获得钻石: 0,
-						新增粉丝: 0,
-						观众峰值: 0,
-						钻石贡献: {},
-					};
-				}
-				viewerCount = 0;
-				likeCount = 0;
-				NewfollowerCount = 直播统计?.[主播ID]?.["新增粉丝"] || 0;
-				diamondsCount = 直播统计?.[主播ID]?.["共获得钻石"] || 0;
-				直播统计[主播ID]["共获得钻石"] = diamondsCount;
-				直播统计[主播ID]["观众峰值"] ??= 0;
-				localStorage.setItem(GiftDay, JSON.stringify(直播统计));
-				updateRoomStats();
-			})
-			.catch((errorMessage) => {
-				$("#stateText").text(errorMessage);
-				// schedule next try if obs username set
-				if (window.settings.username) {
-					setTimeout(() => {
-						connect(window.settings.username);
-					}, 30000);
-				}
-			});
-	} else {
-		alert("no username entered");
+		let uniqueId = window.settings.username || $("#uniqueIdInput").val();
+		if (uniqueId !== "") {
+			主播ID = uniqueId;
+			直播统计 = JSON.parse(localStorage.getItem(GiftDay)) || {};
+			直播统计[主播ID] = 直播统计[主播ID] || {
+				共获得钻石: 0,
+				新增粉丝: 0,
+				观众峰值: 0,
+				钻石贡献: {},
+			};
+			contributions = 直播统计[主播ID]["钻石贡献"];
+			viewerCount = 0;
+			likeCount = 0;
+			diamondsCount = 直播统计[主播ID]["共获得钻石"];
+			localStorage.setItem(GiftDay, JSON.stringify(直播统计));
+			$("#stateText").text("连接中...");
+			connection
+				.connect(uniqueId, {
+					enableExtendedGiftInfo: false,
+					clientParams: {
+						app_language: "zh-CN",
+					},
+				})
+				.then((state) => {
+					$("#stateText").text(`已连接到房间ID ${state.roomId}`);
+					// reset stats
+					updateRoomStats();
+				})
+				.catch((errorMessage) => {
+					$("#stateText").text(errorMessage);
+					// schedule next try if obs username set
+					if (window.settings.username) {
+						setTimeout(() => {
+							connect(window.settings.username);
+						}, 30000);
+					}
+				});
+		} else {
+			alert("no username entered");
+		}
 	}
-}
-// Prevent Cross site scripting (XSS)
+	// Prevent Cross site scripting (XSS)
+
 function sanitize(text) {
 	if (typeof text !== "undefined") {
 		text = text.replace(/</g, "&lt;");
 	}
 	return text;
 }
+
 function updateRoomStats() {
-	直播统计 = JSON.parse(localStorage.getItem(GiftDay));
-	if (
-		直播统计?.[主播ID]?.hasOwnProperty("观众峰值") &&
-		viewerCount > 直播统计[主播ID]["观众峰值"]
-	) {
-		直播统计[主播ID]["观众峰值"] = viewerCount;
+	$("#roomStats").html(
+		`新增粉丝: <b><span style="color: purple;">${newfansCount.toLocaleString()}</span></b> 观众: <b>${viewerCount.toLocaleString()}</b> 点赞: <b><span style="color: red;">${likeCount.toLocaleString()}</span></b> 共获得钻石: <b><span style="color: blue;">${diamondsCount.toLocaleString()}</span></b>`
+	);
+	if (viewerCount > mostviewerCount) {
+		mostviewerCount = 直播统计[主播ID]["观众峰值"] = viewerCount;
 		localStorage.setItem(GiftDay, JSON.stringify(直播统计));
 	}
-	$("#roomStats").html(
-		`新增粉丝: <b><span style="color: purple;">${NewfollowerCount.toLocaleString()}</span></b> 观众: <b>${viewerCount.toLocaleString()}</b> 点赞: <b><span style="color: red;">${likeCount.toLocaleString()}</span></b> 共获得钻石: <b><span style="color: blue;">${diamondsCount.toLocaleString()}</span></b>`
-	);
 }
+
 function generateUsernameLink(data) {
 	return `<a class="usernamelink" href="https://www.tiktok.com/@${data.uniqueId}" target="_blank">${data.nickname}</a>`; // (${data.uniqueId})
 }
+
 function isPendingStreak(data) {
-	return data.giftType === 1 && !data.repeatEnd;
-}
-/**
- * Add a new message to the chat container
- */
-function addChatItem(color, data, text, summarize) {
-	let container = location.href.includes("obs.html")
-		? $(".eventcontainer")
-		: $(".chatcontainer");
-	if (container.find("div").length > 50000) {
-		container.find("div").slice(0, 200).remove();
+		return data.giftType === 1 && !data.repeatEnd;
 	}
-	container.find(".temporary").remove();
-	let LocalTime =
-		data.createTime > 0 ? formatTime("HH:MM:SS", data.createTime) : "";
-	container.append(`
+	/**
+	 * Add a new message to the chat container
+	 */
+
+function addChatItem(color, data, text, summarize) {
+		let container = location.href.includes("obs.html") ? $(".eventcontainer") : $(".chatcontainer");
+		if (container.find("div").length > 50000) {
+			container.find("div").slice(0, 200).remove();
+		}
+		container.find(".temporary").remove();
+		let LocalTime =
+			data.createTime > 0 ? formatTime("HH:MM:SS", data.createTime) : "";
+		container.append(`
     <div class=${summarize ? "temporary" : "static"}>
         <span>
             <b>[${LocalTime}]</b>
@@ -223,36 +223,26 @@ function addChatItem(color, data, text, summarize) {
         </span>
     </div>
 	`);
-	if (!isScrolling) {
-		container.stop();
-		container.animate(
-			{
-				scrollTop: container[0].scrollHeight,
-			},
-			500
-		);
+		if (!isScrolling) {
+			container.stop();
+			container.animate({
+					scrollTop: container[0].scrollHeight,
+				},
+				500
+			);
+		}
 	}
-}
-/**
- * Add a new gift to the gift container
- */
+	/**
+	 * Add a new gift to the gift container
+	 */
+
 function addGiftItem(data) {
-	let container = location.href.includes("obs.html")
-		? $(".eventcontainer")
-		: $(".giftcontainer");
-	/*if (container.find('div').length > 2000) {
-						  container.find('div').slice(0, 100).remove();
-					  }*/
-	let streakId = data.userId.toString() + "_" + data.giftId;
-	let targetGift = gifts.gifts.find((gift) => gift.id === Number(data.giftId));
-	let Giftname;
-	if (targetGift) {
-		Giftname = targetGift.name;
-	} else {
-		console.log(data.giftName);
-		Giftname = data.giftName;
-	}
-	let html = `
+		let container = location.href.includes("obs.html") ? $(".eventcontainer") : $(".giftcontainer");
+		/*if (container.find('div').length > 2000) {
+							  container.find('div').slice(0, 100).remove();
+						  }*/
+		let streakId = data.userId.toString() + "_" + data.giftId;
+		let html = `
         <div data-streakid=${isPendingStreak(data) ? streakId : ""}>
             <img class="miniprofilepicture" src="${data.profilePictureUrl}">
             <span>
@@ -272,85 +262,22 @@ function addGiftItem(data) {
             </span>
         </div>
     `;
-	let existingStreakItem = container.find(`[data-streakid='${streakId}']`);
-	if (existingStreakItem.length) {
-		existingStreakItem.replaceWith(html);
-	} else {
-		container.append(html);
-	}
-	if (!isScrolling) {
-		container.stop();
-		container.animate(
-			{
-				scrollTop: container[0].scrollHeight,
-			},
-			500
-		);
-	}
-	直播统计 = JSON.parse(localStorage.getItem(GiftDay));
-	if (!直播统计[主播ID].hasOwnProperty([Giftname])) {
-		直播统计[主播ID][Giftname] = {};
-	}
-	if (!直播统计[主播ID].hasOwnProperty("钻石贡献")) {
-		直播统计[主播ID]["钻石贡献"] = {};
-	}
-	if (data.giftType === 1 && data.repeatEnd) {
-		const giftItem = 直播统计[主播ID][Giftname][data.uniqueId];
-		const diamondContribution = 直播统计[主播ID]["钻石贡献"][data.uniqueId];
-		if (!giftItem) {
-			直播统计[主播ID][Giftname][data.uniqueId] = [
-				{
-					名字: data.nickname,
-					数量: 0,
+		let existingStreakItem = container.find(`[data-streakid='${streakId}']`);
+		if (existingStreakItem.length) {
+			existingStreakItem.replaceWith(html);
+		} else {
+			container.append(html);
+		}
+		if (!isScrolling) {
+			container.stop();
+			container.animate({
+					scrollTop: container[0].scrollHeight,
 				},
-			];
+				500
+			);
 		}
-		直播统计[主播ID][Giftname][data.uniqueId][0].数量 += data.repeatCount || 1;
-		if (!diamondContribution) {
-			直播统计[主播ID]["钻石贡献"][data.uniqueId] = [
-				{
-					名字: data.nickname,
-					数量: 0,
-				},
-			];
-		}
-		直播统计[主播ID]["钻石贡献"][data.uniqueId][0].数量 +=
-			data.diamondCount * (data.repeatCount || 1);
-		直播统计[主播ID]["共获得钻石"] +=
-			data.diamondCount * (data.repeatCount || 1);
-	} else if (data.giftType !== 1) {
-		if (!直播统计[主播ID][Giftname][data.uniqueId]) {
-			直播统计[主播ID][Giftname][data.uniqueId] = [
-				{ 名字: data.nickname, 数量: 0 },
-			];
-		}
-		直播统计[主播ID][Giftname][data.uniqueId][0].数量 += 1;
-		if (!直播统计[主播ID]["钻石贡献"][data.uniqueId]) {
-			直播统计[主播ID]["钻石贡献"][data.uniqueId] = [
-				{ 名字: data.nickname, 数量: 0 },
-			];
-		}
-		直播统计[主播ID]["钻石贡献"][data.uniqueId][0].数量 += Number(
-			data.diamondCount
-		);
-		直播统计[主播ID]["共获得钻石"] += Number(data.diamondCount);
 	}
-	let sortByQuantity = (group) => {
-		const sortedGroup = {};
-		Object.keys(group)
-			.sort((a, b) => group[b][0].数量 - group[a][0].数量)
-			.forEach((key) => {
-				sortedGroup[key] = group[key];
-			});
-		return sortedGroup;
-	};
-	直播统计[主播ID]["钻石贡献"] = sortByQuantity(直播统计[主播ID]["钻石贡献"]);
-	直播统计[主播ID][Giftname] = sortByQuantity(直播统计[主播ID][Giftname]);
-	localStorage.setItem(GiftDay, JSON.stringify(直播统计));
-	contributions = 直播统计[主播ID]["钻石贡献"];
-	leaderboardText.innerHTML = getTopThreeContributors().join("		");
-}
-// liveIntro
+	// liveIntro
 connection.on("liveIntro", (msg) => {
 	//addChatItem('#447dd4', msg, '当前粉丝数量: ' + msg.followInfo.followerCount)
 	addChatItem("#ff005e", msg, msg.description);
@@ -393,8 +320,49 @@ connection.on("chat", (msg) => {
 });
 // New gift received
 connection.on("gift", (data) => {
+	let targetGift = gifts.gifts.find((gift) => gift.id === Number(data.giftId));
+	if (targetGift) {
+		Giftname = targetGift.name;
+	} else {
+		console.log(data.giftName);
+		Giftname = data.giftName;
+	}
 	if (!isPendingStreak(data) && data.diamondCount > 0) {
+		直播统计 = JSON.parse(localStorage.getItem(GiftDay));
+		直播统计[主播ID]["礼物"] = 直播统计[主播ID]["礼物"] || {};
+		直播统计[主播ID]["礼物"][Giftname] = 直播统计[主播ID]["礼物"][Giftname] || {};
+		直播统计[主播ID]["礼物"][Giftname]["统计"] = 直播统计[主播ID]["礼物"][Giftname]["统计"] || [{
+			单价: 0,
+			数量: 0
+		}];
+		直播统计[主播ID]["礼物"][Giftname][data.uniqueId] = 直播统计[主播ID]["礼物"][Giftname][data.uniqueId] || [{
+			名字: data.nickname,
+			数量: 0
+		}];
+		直播统计[主播ID]["礼物"][Giftname][data.uniqueId][0]["数量"] += data.repeatCount;
+		直播统计[主播ID]["礼物"][Giftname]["统计"][0]["单价"] = data.diamondCount
+		直播统计[主播ID]["礼物"][Giftname]["统计"][0]["数量"] += data.repeatCount
+		直播统计[主播ID]["钻石贡献"][data.uniqueId] = 直播统计[主播ID]["钻石贡献"][data.uniqueId] || [{
+			名字: data.nickname,
+			数量: 0
+		}];
+		直播统计[主播ID]["钻石贡献"][data.uniqueId][0]["数量"] += (data.diamondCount * data.repeatCount);
 		diamondsCount += data.diamondCount * data.repeatCount;
+		直播统计[主播ID]["共获得钻石"] = diamondsCount;
+		let sortByQuantity = (group) => {
+			const sortedGroup = {};
+			Object.keys(group)
+				.sort((a, b) => group[b][0]["数量"] - group[a][0]["数量"])
+				.forEach((key) => {
+					sortedGroup[key] = group[key];
+				});
+			return sortedGroup;
+		};
+		直播统计[主播ID]["钻石贡献"] = sortByQuantity(直播统计[主播ID]["钻石贡献"]);
+		直播统计[主播ID]["礼物"][Giftname] = sortByQuantity(直播统计[主播ID]["礼物"][Giftname]);
+		localStorage.setItem(GiftDay, JSON.stringify(直播统计));
+		contributions = 直播统计[主播ID]["钻石贡献"];
+		leaderboardText.innerHTML = getTopThreeContributors().join("	");
 		updateRoomStats();
 	}
 	if (window.settings.showGifts === "0") return;
@@ -405,12 +373,11 @@ connection.on("social", (data) => {
 	if (window.settings.showFollows === "0") return;
 	let color;
 	let msg;
-	let 直播统计 = JSON.parse(localStorage.getItem(GiftDay)) || {};
 	if (data.displayType.includes("follow")) {
 		color = "#ff005e";
 		msg = "已关注主播";
-		NewfollowerCount += 1;
-		直播统计[主播ID]["新增粉丝"] = NewfollowerCount;
+		直播统计 = JSON.parse(localStorage.getItem(GiftDay));
+		newfansCount = ++直播统计[主播ID]["新增粉丝"];
 		localStorage.setItem(GiftDay, JSON.stringify(直播统计));
 		updateRoomStats();
 	} else {
