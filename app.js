@@ -297,7 +297,7 @@ connection.on("like", (msg) => {
 	updateRoomStats();
 	if (window.settings.showLikes === "0") return;
 	if (typeof msg.likeCount === "number") {
-		addChatItem("#447dd4", msg, " 赞了直播", true);
+		//addChatItem("#447dd4", msg, " 赞了直播", true);
 	}
 });
 // Member join
@@ -310,7 +310,7 @@ connection.on("member", (msg) => {
 	joinMsgDelay += addDelay;
 	setTimeout(() => {
 		joinMsgDelay -= addDelay;
-		addChatItem("#21b2c2", msg, "进入直播间", true);
+		//addChatItem("#21b2c2", msg, "进入直播间", true);
 	}, joinMsgDelay);
 });
 // New chat comment received
@@ -383,7 +383,7 @@ connection.on("social", (data) => {
 		color = "#2fb816";
 		msg = "已分享直播间";
 	}
-	addChatItem(color, data, msg, true);
+	//addChatItem(color, data, msg, true);
 });
 connection.on("streamEnd", () => {
 	$("#stateText").text("直播已结束.");
