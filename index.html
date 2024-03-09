@@ -19,8 +19,8 @@
     <script src="giftslist.js"></script>
 
     <script>
-        function generateOverlay() {
-            let username = $('#uniqueIdInput').val();
+        function generateOverlay(username) {
+            // let username = $('#uniqueIdInput').val();
             let url = `/obs.html?username=${username}&showLikes=1&showChats=1&showGifts=1&showFollows=1&showJoins=1&bgColor=rgb(24,23,28)&fontColor=rgb(227,229,235)&fontSize=1.3em`;
         
             if(username) {
@@ -42,10 +42,10 @@
     </div>
 
     <div class="inputFields">
-        <p>Enter the <b>@username</b>: wzww1481v0e tcm374 </p>
+        <p>Enter the <b>@username</b>: tcm374 wzww1481v0e</p>
         <input type="text" id="uniqueIdInput">
         <input type="button" id="connectButton" value="connect">
-        <a href="#" onclick="generateOverlay()"style="display:none;">Generate Overlay URL</a>
+        <a href="#" onclick="generateOverlay($('#uniqueIdInput').val())"style="display:none;">Generate Overlay URL</a>
         <pre id="LeaderboardText">
     </div>
 
