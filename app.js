@@ -85,7 +85,7 @@ function getTopThreeContributors() {
 		const quantity = value[0].数量;
 		const color = getColor(index);
 		const fontSize = getFontSize(index);
-		return `<span style="color: ${color}; font-size: ${fontSize}">${name}(${quantity}💎)</span>`;
+		return `<span style="color: ${color}; font-size: ${fontSize}">${name}(${quantity})</span>`;
 	});
 	return topThreeContributors;
 }
@@ -158,7 +158,7 @@ function connect() {
 				},
 			})
 			.then((state) => {
-				$("#stateText").text(`已连接到房间ID ${state.roomId}`);
+				$("#stateText").text(`ID ${state.roomId}`);
 				// reset stats
 				updateRoomStats();
 			})
@@ -186,7 +186,7 @@ function sanitize(text) {
 
 function updateRoomStats() {
 	$("#roomStats").html(
-		`<b><span style="color: purple;">新增粉丝: ${newfansCount.toLocaleString()}</span></b>观众: <b>${viewerCount.toLocaleString()}</b><b><span style="color: red;">点赞: ${likeCount.toLocaleString()}</span></b><b><span style="color: blue;">共获得钻石: ${diamondsCount.toLocaleString()}</span></b>`
+		`<b><span style="color: purple;">follow: ${newfansCount.toLocaleString()}</span></b>views: <b>${viewerCount.toLocaleString()}</b><b><span style="color: red;">likes: ${likeCount.toLocaleString()}</span></b><b><span style="color: blue;">dia: ${diamondsCount.toLocaleString()}</span></b>`
 	);
 	if (viewerCount > mostviewerCount) {
 		mostviewerCount = 直播统计[主播ID]["观众峰值"] = viewerCount;
