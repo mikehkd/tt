@@ -1,6 +1,7 @@
 // This will use the demo backend if you open index.html locally via file://, otherwise your server will be used
 //let backendUrl = location.protocol === 'file:' ? "https://tiktok-chat-reader.zerody.one/" : undefined;
-let backendUrl = "https://tiktok-chat-reader.zerody.one/";
+//let backendUrl = "https://tiktok-chat-reader.zerody.one/";
+let backendUrl = "http://localhost:8081";
 let connection = new TikTokIOConnection(backendUrl);
 const formatTime = (format = "", num = new Date().getTime()) => {
 	format = format || "YYYY-mm-dd HH:MM:SS"; //第一个参数不填时，使用默认格式
